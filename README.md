@@ -19,5 +19,7 @@ When the script asks for the directory where the files live which you want to re
 ---
 This script shows some information regarding your machine.
 You start the script by moving into the directory where the script is and typing:
+
 ./system_information_script
+
 into the terminal.
