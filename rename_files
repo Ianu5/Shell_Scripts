@@ -1,0 +1,136 @@
+#!/bin/bash
+
+# rename menu script that interacts with the user
+
+getConsent () {
+	# this function checks if the user gave a positive or negative response it takes ones argument (Users response) to check for 
+	local yesOptions=("y" "Y" "yes" "YES" "Yes")
+	if ! local match="$1"; then
+		return 1
+	fi
+
+	for option in "${yesOptions[@]}"; do
+		[[ "$option" == "$match" ]] && return 0
+	done
+
+	return 1
+}
+
+checkDirectory () {
+	local directory="$1"
+	if [[ -d "$directory" ]]; then
+		echo -e "\nThe directory '$directory' does exist"
+		return 0
+	else
+		echo "$directory does not exist" >&2
+		return 1
+	fi
+}
+
+showFiles () {
+	local directory="$1"
+	printf "\nYou have '%d' files in your directory\n" $(ls $directory | wc -l)
+	ls -C $directory
+
+	if (( $(ls $directory | wc -l) > 0 )); then
+		return 0
+	else
+		return 1
+	fi
+}
+
+renameMenu () {
+local directory="$1"
+
+echo "
+
+Choose how you want to rename your files
+
+1. Add a prefix to your files
+2. Add a suffix to your files
+3. Rename your files and number them
+0. Quit
+"
+read -p "Enter your selection > "
+
+case "$REPLY" in
+	0)	echo "Quitting program"
+		return 1
+		;;
+	1)	addPrefix $directory
+		return 0
+		;;
+	2)	addSuffix $directory
+		return 0
+		;;
+	3)	renameFiles $directory
+		return 0
+esac
+}
+
+renameFiles () {
+	read -p "How would you like to name you files? "
+	local directory="$1"	
+	local newName="$REPLY"
+	local files="$(ls $directory)"
+	local counter=1
+
+	for file in $files; do
+		mv "$directory"/"$file" "$directory"/"$newName"-"$counter"
+		counter=$((counter+1))
+	done
+	
+	return
+}
+
+addPrefix () {
+	local directory="$1"
+	local files="$(ls $directory)"
+	read -p "What prefix would you like to add to your filenames? "
+	local prefix="$REPLY"
+
+	for file in $files; do
+		mv "$directory"/"$file" "$directory"/"$prefix""$file"
+	done
+
+	return
+}
+
+addSuffix () {
+	local directory="$1"
+	local files="$(ls $directory)"
+	read -p "What suffix would you like to add to your filenames? "
+	local suffix="$REPLY"
+
+	for file in $files; do
+		mv "$directory"/"$file" "$directory"/"$file""$suffix"
+	done
+
+	return
+}
+
+clear
+
+echo "This is a program to help you rename multiple files in a directory"
+read -p "Do you want to continue? [y/n] > "
+
+while true; do	
+	if ! getConsent "$REPLY"; then
+		break
+	fi
+	
+	read -p "Give me the name of the directory in which you wish to rename your files > " directory
+	if ! checkDirectory $directory; then
+		break
+	fi
+
+	if ! showFiles $directory; then
+		break
+	fi
+	
+	renameMenu $directory
+	showFiles $directory
+
+	echo ""
+	read -p "Do you want to rename the files of another directory? [y/n] > "
+done

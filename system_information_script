@@ -1,0 +1,69 @@
+#!/bin/bash
+
+show_uptime () {
+    echo "$(uptime -p)"
+    return
+}
+
+show_space_usage () {
+    echo "$(df -h /home/$(whoami))"
+    return
+}
+
+show_processes () {
+    top -n 4
+    return
+}
+
+show_hardware () {
+    sudo lshw -short
+    return
+}
+
+show_distro () {
+    version=$(cat /etc/os-release | grep "PRETTY_NAME=")
+    version="${version/PRETTY_NAME=/""}"
+    version=${version%\"}
+    version=${version#\"}
+    echo "$version"
+    return
+}
+
+clear
+echo -e "
+Today is $(date)
+====================================
+Select:
+
+1. Show uptime
+2. Show space usage
+3. Show processes
+4. Show hardware
+5. Show Distro Information
+0. Quit
+"
+read -p "Choose [0-5] > " selection
+
+case "$selection" in
+    0)  echo "Quitting program"
+        exit
+        ;;
+    1)  echo "Showing uptime"
+        show_uptime
+        ;;
+    2)  echo "Showing space usage"
+        show_space_usage
+        ;;
+    3)  echo "Showing processes"
+        show_processes
+        ;;
+    4)  echo "Showing system hardware"
+        show_hardware
+        ;;
+    5)  echo "Showing Distro Information"
+        show_distro
+        ;;
+    *)  echo "Invalid entry"
+        exit
+        ;;
+esac
