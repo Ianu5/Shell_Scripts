@@ -8,6 +8,7 @@ This script renames all files in a directory. Especially useful for bulk renamin
 You can add a prefix or suffix to the filenames without changing the actual filenames, or you can rename the files with the same name. The script will number them in this case.
 
 To start the script move into the folder with the script and type into the terminal:
+
 ./rename_script
 
 This will start the script and let you choose what option to take when renaming files.
